@@ -99,23 +99,30 @@ public class PicassoImageCacheWrapper implements ImageCacheWrapper {
     }
 
     @Override
-    public void loadImage(final ImageRequestParameters imageRequestParameters,
-            ImageView imageView) {
+    public void loadImage(final ImageRequestParameters imageRequestParameters, ImageView imageView) {
+
         RequestCreator requestCreator = mPicasso.load(imageRequestParameters.getUri())
                 .tag(imageRequestParameters.getTag())
                 .placeholder(imageRequestParameters.getPlaceholder());
+
+        boolean hasValidResizeField = imageRequestParameters.getResizeWidthTo() >= 0
+                && imageRequestParameters.getResizeHeightTo() >= 0;
 
         if (imageRequestParameters.isShouldCenterImage()) {
             requestCreator = requestCreator.centerCrop();
         }
 
         if (imageRequestParameters.getRotateAngleTo() == 0) {
-            requestCreator.resize(imageRequestParameters.getResizeWidthTo(),
-                    imageRequestParameters.getResizeHeightTo());
+            if (hasValidResizeField) {
+                requestCreator.resize(imageRequestParameters.getResizeWidthTo(),
+                        imageRequestParameters.getResizeHeightTo());
+            }
         } else {
-            requestCreator.resize(imageRequestParameters.getResizeWidthTo(),
-                    imageRequestParameters.getResizeHeightTo()).rotate(
-                    imageRequestParameters.getRotateAngleTo());
+            if (hasValidResizeField) {
+                requestCreator.resize(imageRequestParameters.getResizeWidthTo(),
+                        imageRequestParameters.getResizeHeightTo());
+            }
+            requestCreator.rotate(imageRequestParameters.getRotateAngleTo());
         }
 
         if (imageRequestParameters.shouldScaleDownTo()) {

@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -50,6 +51,7 @@ public class AvatarView extends View {
     private int mMaxAvatar = 2;
     private static final float BORDER_SIZE_DP = 1f;
     private static final float MULTI_FRACTION = 26f / 40f;
+    private Bitmap avatarPlaceholderBitmap;
 
     static {
         PAINT_TRANSPARENT.setARGB(0, 255, 255, 255);
@@ -104,7 +106,8 @@ public class AvatarView extends View {
         mPaintBackground.setColor(getResources().getColor(R.color.layer_ui_avatar_background));
         mPaintBorder.setColor(getResources().getColor(R.color.layer_ui_avatar_border));
         mPaintInitials.setColor(getResources().getColor(R.color.layer_ui_avatar_text));
-
+        Drawable avatarPlaceholder = ContextCompat.getDrawable(getContext(), R.mipmap.avatar_placeholder);
+        avatarPlaceholderBitmap = ((BitmapDrawable) avatarPlaceholder).getBitmap();
         return this;
     }
 
@@ -319,8 +322,6 @@ public class AvatarView extends View {
             //Check if the participants are more than two and display the group avatar placeholder
             if (mParticipantsInitialSize > 2 && !hasDrawnGroupAvatarResource) {
                 hasDrawnGroupAvatarResource = true;
-                Drawable avatarPlaceholder = getContext().getResources().getDrawable(R.mipmap.avatar_placeholder);
-                Bitmap avatarPlaceholderBitmap = ((BitmapDrawable) avatarPlaceholder).getBitmap();
                 canvas.drawBitmap(avatarPlaceholderBitmap, mContentRect.left, mContentRect.top, PAINT_BITMAP);
             } else {
                 if (bitmap != null && identity.getAvatarImageUrl() != null) {
