@@ -92,7 +92,7 @@
             <Space
                 android:id="@+id/cluster_space"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/layer_ui_message_cluster_space_gap"
+                android:layout_height="@{viewModel.isPreviousMessageFromSameUser ? @dimen/layer_ui_zero_padding : @dimen/layer_ui_message_cluster_space_gap, default=@dimen/layer_ui_message_cluster_space_gap}"
                 android:visibility="@{viewModel.clusterSpaceVisible ? View.VISIBLE : View.GONE}" />
 
             <TextView
@@ -119,6 +119,7 @@
                     android:paddingBottom="@dimen/layer_ui_message_item_cell_padding_bottom"
                     android:paddingLeft="@dimen/layer_ui_message_item_avatar_padding_left"
                     android:paddingRight="@dimen/layer_ui_avatar_right_padding_message">
+
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

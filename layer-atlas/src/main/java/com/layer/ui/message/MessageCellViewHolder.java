@@ -46,7 +46,7 @@ public class MessageCellViewHolder extends
 
     public void bind(Message message, boolean shouldAvatarBeVisible, boolean shouldDisplayAvatarSpace, boolean isClusterSpaceVisible,
             boolean shouldDisplayName, boolean shouldBindDateTimeForMessage, String recipientStatus,
-            boolean isRecipientStatusVisible, DateFormatter dateFormatter, boolean isCellTypeMe) {
+            boolean isRecipientStatusVisible, DateFormatter dateFormatter, boolean isCellTypeMe, boolean isPreviousMessageFromSameUser) {
 
 
         Context context = mBinding.getRoot().getContext();
@@ -77,6 +77,7 @@ public class MessageCellViewHolder extends
         messageItemViewModel.setShouldShowDisplayName(shouldDisplayName);
         messageItemViewModel.setShouldBindDateTimeForMessage(shouldBindDateTimeForMessage);
         messageItemViewModel.setParticipants(Collections.singleton(message.getSender()));
+        messageItemViewModel.setIsPreviousMessageFromSameUser(isPreviousMessageFromSameUser);
         messageItemViewModel.setMessageSent(message.isSent());
         messageItemViewModel.setMyCellType(isCellTypeMe);
         messageItemViewModel.notifyChange();

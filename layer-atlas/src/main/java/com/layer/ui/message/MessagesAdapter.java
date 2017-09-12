@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -341,6 +340,9 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
 
     public void bindCellViewHolder(MessageCellViewHolder viewHolder, int position) {
         Message message = getItem(position);
+        boolean isPreviousMessageFromSameUser = (position > 0) &&
+                (message.getSender().getId() == getItem(position - 1).getSender().getId());
+
         viewHolder.mMessage = message;
         MessageCell messageCell = mCellTypesByViewType.get(viewHolder.getItemViewType());
         mOneOnOne = message.getConversation().getParticipants().size() == 2;
@@ -403,7 +405,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
         }
 
         viewHolder.bind(message, shouldAvatarBeVisible, shouldDisplayAvatarSpace, isClusterSpaceVisible, shouldDisplayName,
-                shouldBindDateTimeForMessage, str, isRecipientStatusVisible, mDateFormatter, messageCell.mMe);
+                shouldBindDateTimeForMessage, str, isRecipientStatusVisible, mDateFormatter, messageCell.mMe, isPreviousMessageFromSameUser);
 
         if (!mOneOnOne && (messageCluster.mClusterWithNext == null
                 || messageCluster.mClusterWithNext != MessageCluster.Type.LESS_THAN_MINUTE)) {
