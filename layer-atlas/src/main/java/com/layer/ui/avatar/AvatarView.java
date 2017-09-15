@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -50,8 +49,9 @@ public class AvatarView extends View {
 
     private int mMaxAvatar = 2;
     private static final float BORDER_SIZE_DP = 1f;
-    private static final float MULTI_FRACTION = 26f / 40f;
-    private Bitmap avatarPlaceholderBitmap;
+    private static final float MULTI_FRACTION = 0.83f;
+    private Drawable avatarPlaceholder = ContextCompat.getDrawable(getContext(), R.drawable.avatar_placeholder);
+
 
     static {
         PAINT_TRANSPARENT.setARGB(0, 255, 255, 255);
@@ -77,9 +77,10 @@ public class AvatarView extends View {
     private float mTextSize;
 
     private Rect mRect = new Rect();
+    private Rect mImageRect = new Rect();
     private RectF mContentRect = new RectF();
     private AvatarViewModel mViewModel;
-    private int mParticipantsInitialSize;
+    private int mInitialParticipantsSize;
 
     public AvatarView(Context context) {
         super(context);
@@ -106,8 +107,7 @@ public class AvatarView extends View {
         mPaintBackground.setColor(getResources().getColor(R.color.layer_ui_avatar_background));
         mPaintBorder.setColor(getResources().getColor(R.color.layer_ui_avatar_border));
         mPaintInitials.setColor(getResources().getColor(R.color.layer_ui_avatar_text));
-        Drawable avatarPlaceholder = ContextCompat.getDrawable(getContext(), R.mipmap.avatar_placeholder);
-        avatarPlaceholderBitmap = ((BitmapDrawable) avatarPlaceholder).getBitmap();
+
         return this;
     }
 
@@ -121,7 +121,7 @@ public class AvatarView extends View {
     public void setParticipants(Identity... participants) {
         mParticipants.clear();
         mParticipants.addAll(Arrays.asList(participants));
-        mParticipantsInitialSize = mParticipants.size();
+        mInitialParticipantsSize = mParticipants.size();
         update();
     }
 
@@ -131,7 +131,7 @@ public class AvatarView extends View {
     public void setParticipants(Set<Identity> participants) {
         mParticipants.clear();
         mParticipants.addAll(participants);
-        mParticipantsInitialSize = mParticipants.size();
+        mInitialParticipantsSize = mParticipants.size();
         update();
     }
 
@@ -280,6 +280,7 @@ public class AvatarView extends View {
                 mPendingLoads.clear();
             }
         }
+
         return true;
     }
 
@@ -287,11 +288,11 @@ public class AvatarView extends View {
         Handler handler = getHandler();
         if (handler != null) {
             handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        invalidate();
-                    }
-                });
+                @Override
+                public void run() {
+                    invalidate();
+                }
+            });
         }
     }
 
@@ -310,6 +311,7 @@ public class AvatarView extends View {
         mContentRect.set(cx - contentRadius, cy - contentRadius, cx + contentRadius, cy + contentRadius);
 
         boolean hasDrawnGroupAvatarResource = false;
+
         for (Map.Entry<Identity, String> entry : mInitials.entrySet()) {
             // Border / background
             if (hasBorder) canvas.drawCircle(cx, cy, mOuterRadius, mPaintBorder);
@@ -320,9 +322,11 @@ public class AvatarView extends View {
             Bitmap bitmap = (bitmapWrapper == null) ? null : bitmapWrapper.getBitmap();
 
             //Check if the participants are more than two and display the group avatar placeholder
-            if (mParticipantsInitialSize > 2 && !hasDrawnGroupAvatarResource) {
+            if (mInitialParticipantsSize > 2 && !hasDrawnGroupAvatarResource) {
                 hasDrawnGroupAvatarResource = true;
-                canvas.drawBitmap(avatarPlaceholderBitmap, mContentRect.left, mContentRect.top, PAINT_BITMAP);
+                mContentRect.roundOut(mImageRect);
+                avatarPlaceholder.setBounds(mImageRect);
+                avatarPlaceholder.draw(canvas);
             } else {
                 if (bitmap != null && identity.getAvatarImageUrl() != null) {
                     canvas.drawBitmap(bitmap, mContentRect.left, mContentRect.top, PAINT_BITMAP);
