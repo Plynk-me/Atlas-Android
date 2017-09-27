@@ -16,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.layer.sdk.LayerObjectRequest;
 import com.layer.ui.R;
 import com.layer.ui.message.messagetypes.AttachmentSender;
 import com.layer.ui.util.Log;
@@ -167,6 +168,12 @@ public class LocationSender extends AttachmentSender {
             Context context = sender.getContext();
             LayerClient client = sender.getLayerClient();
             try {
+
+
+                LayerObjectRequest<Identity> authenticatedUser = client.getAuthenticatedUser();
+                authenticatedUser.get
+
+
                 Identity me = client.getAuthenticatedUser();
                 String myName = me == null ? "" : Util.getDisplayName(me);
                 JSONObject o = new JSONObject()

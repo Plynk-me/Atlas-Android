@@ -23,8 +23,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.layer.sdk.LayerClient;
-import com.layer.sdk.exceptions.LayerException;
-import com.layer.sdk.listeners.LayerAuthenticationListener;
+import com.layer.sdk.authentication.AuthenticationListener;
 import com.layer.sdk.listeners.LayerProgressListener;
 import com.layer.sdk.messaging.Identity;
 import com.layer.sdk.messaging.MessagePart;
@@ -200,28 +199,24 @@ public class Util {
      */
     public static void deauthenticate(LayerClient layerClient, final DeauthenticationCallback callback) {
         final AtomicBoolean alerted = new AtomicBoolean(false);
-        final LayerAuthenticationListener listener = new LayerAuthenticationListener.BackgroundThread() {
+
+        AuthenticationListener listener = new AuthenticationListener() {
             @Override
-            public void onAuthenticated(LayerClient layerClient, String s) {
+            public void onAuthenticated(LayerClient client, String userId) {
 
             }
 
             @Override
-            public void onDeauthenticated(LayerClient layerClient) {
+            public void onDeauthenticated(LayerClient client, String userId) {
                 if (alerted.compareAndSet(false, true)) {
-                    callback.onDeauthenticationSuccess(layerClient);
+                    callback.onDeauthenticationSuccess(client);
                 }
             }
 
             @Override
-            public void onAuthenticationChallenge(LayerClient layerClient, String s) {
-
-            }
-
-            @Override
-            public void onAuthenticationError(LayerClient layerClient, LayerException e) {
+            public void onAuthenticationError(LayerClient client, Exception exception) {
                 if (alerted.compareAndSet(false, true)) {
-                    callback.onDeauthenticationFailed(layerClient, e.getMessage());
+                    callback.onDeauthenticationFailed(client, exception.getMessage());
                 }
             }
         };

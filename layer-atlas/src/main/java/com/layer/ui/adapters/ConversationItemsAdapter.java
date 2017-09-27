@@ -47,7 +47,7 @@ public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversati
         mConversationItemFormatter = conversationItemFormatter;
         mImageCacheWrapper = imageCacheWrapper;
         mIdentityEventListener = new IdentityRecyclerViewEventListener(this);
-        layerClient.registerEventListener(mIdentityEventListener);
+        layerClient.registerDataObserver(mIdentityEventListener);
 
         mIdentityFormatter = identityFormatter;
         mIdentityFormatter = new IdentityFormatterImpl();
@@ -88,7 +88,7 @@ public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversati
 
     @Override
     public void onDestroy() {
-        getLayerClient().unregisterEventListener(mIdentityEventListener);
+        getLayerClient().unregisterDataObserver(mIdentityEventListener);
     }
 
     //==============================================================================================

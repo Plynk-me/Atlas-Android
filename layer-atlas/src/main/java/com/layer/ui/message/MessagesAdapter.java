@@ -119,7 +119,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
                     }
                 });
         mIdentityEventListener = new IdentityRecyclerViewEventListener(this);
-        mLayerClient.registerEventListener(mIdentityEventListener);
+        mLayerClient.registerDataObserver(mIdentityEventListener);
     }
 
 
@@ -145,7 +145,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
      * Performs cleanup when the Activity/Fragment using the adapter is destroyed.
      */
     public void onDestroy() {
-        mLayerClient.unregisterEventListener(mIdentityEventListener);
+        mLayerClient.registerDataObserver(mIdentityEventListener);
     }
 
     public MessagesAdapter setRecyclerView(RecyclerView recyclerView) {
