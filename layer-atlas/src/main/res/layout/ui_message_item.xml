@@ -92,7 +92,7 @@
             <Space
                 android:id="@+id/cluster_space"
                 android:layout_width="match_parent"
-                android:layout_height="@{viewModel.isPreviousMessageFromSameUser ? @dimen/layer_ui_zero_padding : @dimen/layer_ui_message_cluster_space_gap, default=@dimen/layer_ui_message_cluster_space_gap}"
+                android:layout_height="@{@dimen/layer_ui_message_cluster_space_gap, default=@dimen/layer_ui_message_cluster_space_gap}"
                 android:visibility="@{viewModel.clusterSpaceVisible ? View.VISIBLE : View.GONE}" />
 
             <TextView

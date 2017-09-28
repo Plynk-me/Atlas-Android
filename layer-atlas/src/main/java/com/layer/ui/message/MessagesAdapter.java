@@ -340,9 +340,6 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
 
     public void bindCellViewHolder(MessageCellViewHolder viewHolder, int position) {
         Message message = getItem(position);
-        boolean isPreviousMessageFromSameUser = (position > 0) &&
-                (message.getSender().getId() == getItem(position - 1).getSender().getId());
-
         viewHolder.mMessage = message;
         MessageCell messageCell = mCellTypesByViewType.get(viewHolder.getItemViewType());
         mOneOnOne = message.getConversation().getParticipants().size() == 2;
@@ -351,8 +348,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
         MessageCluster messageCluster = getClustering(message, position);
         updateValuesForRecipient(messageCell.mMe, position, message);
 
-        boolean isClusterSpaceVisible = messageCluster.mClusterWithPrevious == MessageCluster.Type.NEW_SENDER
-                || messageCluster.mClusterWithPrevious == MessageCluster.Type.LESS_THAN_HOUR;
+        boolean isClusterSpaceVisible = messageCluster.mClusterWithPrevious == MessageCluster.Type.NEW_SENDER;
         boolean shouldDisplayName = !messageCell.mMe && (!mOneOnOne && (
                 messageCluster.mClusterWithPrevious == null
                 || messageCluster.mClusterWithPrevious == MessageCluster.Type.NEW_SENDER));
@@ -405,7 +401,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
         }
 
         viewHolder.bind(message, shouldAvatarBeVisible, shouldDisplayAvatarSpace, isClusterSpaceVisible, shouldDisplayName,
-                shouldBindDateTimeForMessage, str, isRecipientStatusVisible, mDateFormatter, messageCell.mMe, isPreviousMessageFromSameUser);
+                shouldBindDateTimeForMessage, str, isRecipientStatusVisible, mDateFormatter, messageCell.mMe);
 
         if (!mOneOnOne && (messageCluster.mClusterWithNext == null
                 || messageCluster.mClusterWithNext != MessageCluster.Type.LESS_THAN_MINUTE)) {
@@ -642,7 +638,6 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
         mFooterPosition--;
         updateRecipientStatusPosition();
         notifyItemRemoved(position);
-
         if (Log.isPerfLoggable()) {
             Log.perf("Messages adapter - onQueryItemRemoved. Position: " + position);
         }

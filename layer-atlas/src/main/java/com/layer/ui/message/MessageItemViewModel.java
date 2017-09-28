@@ -27,7 +27,6 @@ public class MessageItemViewModel extends ItemViewModel<Message> {
     private String mTypingIndicatorMessage;
     private boolean mIsTypingIndicatorVisible;
     private boolean mShouldDisplayAvatarSpace;
-    private boolean mIsPreviousMessageFromSameUser;
 
     public MessageItemViewModel(
             OnItemClickListener<Message> itemClickListener) {
@@ -176,14 +175,5 @@ public class MessageItemViewModel extends ItemViewModel<Message> {
     @Bindable
     public boolean getShouldDisplayAvatarSpace() {
         return mShouldDisplayAvatarSpace;
-    }
-
-    public void setIsPreviousMessageFromSameUser(boolean isPreviousMessageFromSameUser) {
-        mIsPreviousMessageFromSameUser = isPreviousMessageFromSameUser;
-    }
-
-    @Bindable
-    public boolean getIsPreviousMessageFromSameUser() {
-        return mIsPreviousMessageFromSameUser;
     }
 }
