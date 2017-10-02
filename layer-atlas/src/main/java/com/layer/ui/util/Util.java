@@ -15,17 +15,21 @@
  */
 package com.layer.ui.util;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.authentication.AuthenticationListener;
 import com.layer.sdk.listeners.LayerProgressListener;
 import com.layer.sdk.messaging.Identity;
+import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.MessagePart;
 import com.layer.sdk.query.Queryable;
 import com.layer.ui.BuildConfig;
@@ -189,6 +193,37 @@ public class Util {
             }
         }
         return part.isContentReady();
+    }
+
+    // TODO Is this the appropriate paradigm
+    public static MessagePart getMessagePartBlocking(LayerClient layerClient, Uri partUri) {
+        final LiveData<LayerObject> liveData = layerClient.getLive(partUri);
+        if (liveData.getValue() == null) {
+            // Wait for the data to be loaded. This is okay since we're not on the main thread.
+            final CountDownLatch latch = new CountDownLatch(1);
+
+            liveData.observeForever(new Observer<LayerObject>() {
+                @Override
+                public void onChanged(@Nullable LayerObject layerObject) {
+                    if (layerObject != null) {
+                        liveData.removeObserver(this);
+                        latch.countDown();
+                    }
+                }
+            });
+
+            try {
+                latch.await(3, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                if (Log.isLoggable(Log.ERROR)) {
+                    Log.d("Failed to find message part: " + partUri, e);
+                }
+                return null;
+            }
+        }
+
+        if (!(liveData.getValue() instanceof MessagePart)) return null;
+        return (MessagePart) liveData.getValue();
     }
 
     /**

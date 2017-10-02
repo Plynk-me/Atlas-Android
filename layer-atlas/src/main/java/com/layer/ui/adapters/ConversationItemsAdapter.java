@@ -1,27 +1,28 @@
 package com.layer.ui.adapters;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.view.ViewGroup;
 
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
+import com.layer.sdk.messaging.Identity;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.RecyclerViewController;
-import com.layer.ui.databinding.UiFourPartItemBinding;
-import com.layer.ui.identity.IdentityFormatter;
-import com.layer.ui.identity.IdentityFormatterImpl;
 import com.layer.ui.conversationitem.ConversationItemFormatter;
 import com.layer.ui.conversationitem.ConversationItemViewModel;
+import com.layer.ui.databinding.UiFourPartItemBinding;
+import com.layer.ui.fourpartitem.FourPartItemViewHolder;
+import com.layer.ui.identity.IdentityFormatter;
+import com.layer.ui.identity.IdentityFormatterImpl;
 import com.layer.ui.recyclerview.OnItemClickListener;
 import com.layer.ui.style.FourPartItemStyle;
 import com.layer.ui.util.IdentityRecyclerViewEventListener;
 import com.layer.ui.util.imagecache.ImageCacheWrapper;
 
 import java.util.Collection;
-
-import com.layer.ui.fourpartitem.FourPartItemViewHolder;
 
 public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversation,
         ConversationItemViewModel, UiFourPartItemBinding, FourPartItemStyle,
@@ -35,6 +36,7 @@ public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversati
     protected ImageCacheWrapper mImageCacheWrapper;
 
     protected IdentityFormatter mIdentityFormatter;
+    private LiveData<Identity> mAuthenticatedUser;
 
     public ConversationItemsAdapter(Context context, LayerClient layerClient,
                                     Query<Conversation> query,
@@ -51,6 +53,8 @@ public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversati
 
         mIdentityFormatter = identityFormatter;
         mIdentityFormatter = new IdentityFormatterImpl();
+
+        mAuthenticatedUser = mLayerClient.getAuthenticatedUserLive();
     }
 
     //==============================================================================================
@@ -60,7 +64,7 @@ public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversati
     @Override
     public FourPartItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         UiFourPartItemBinding binding = UiFourPartItemBinding.inflate(getLayoutInflater(), parent, false);
-        ConversationItemViewModel viewModel = new ConversationItemViewModel(mConversationItemFormatter, mItemClickListener, mLayerClient.getAuthenticatedUser());
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(mConversationItemFormatter, mItemClickListener, mAuthenticatedUser);
         FourPartItemViewHolder itemViewHolder = new FourPartItemViewHolder<>(binding, viewModel, getStyle(), mImageCacheWrapper, mIdentityFormatter);
 
         binding.addOnRebindCallback(mOnRebindCallback);

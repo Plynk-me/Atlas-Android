@@ -1,5 +1,6 @@
 package com.layer.ui.message;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.databinding.ViewDataBinding;
 import android.net.Uri;
@@ -33,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +97,8 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
     private Set<Identity> mUsersTyping;
     private boolean mOneOnOne;
 
+    private LiveData<Identity> mAuthenticatedUser;
+
     public MessagesAdapter(Context context, LayerClient layerClient,
             ImageCacheWrapper imageCacheWrapper, DateFormatter dateFormatter) {
         super(context, layerClient, TAG, false);
@@ -120,6 +122,9 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
                 });
         mIdentityEventListener = new IdentityRecyclerViewEventListener(this);
         mLayerClient.registerDataObserver(mIdentityEventListener);
+
+        // TODO Handle updates
+        mAuthenticatedUser = mLayerClient.getAuthenticatedUserLive();
     }
 
 
@@ -281,7 +286,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
     public int getItemViewType(int position) {
         if (mFooterView != null && position == mFooterPosition) return VIEW_TYPE_FOOTER;
         Message message = getItem(position);
-        Identity authenticatedUser = mLayerClient.getAuthenticatedUser();
+        Identity authenticatedUser = mAuthenticatedUser.getValue();
         boolean isMe = authenticatedUser != null && authenticatedUser.equals(message.getSender());
         for (CellFactory factory : mCellFactories) {
             if (!factory.isBindable(message)) continue;
