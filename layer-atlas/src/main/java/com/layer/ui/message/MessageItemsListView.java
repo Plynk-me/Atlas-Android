@@ -90,6 +90,10 @@ public class MessageItemsListView extends SwipeRefreshLayout implements LayerDat
     }
 
     public void setAdapter(final MessagesAdapter adapter) {
+        if (adapter == null) {
+            return;
+        }
+
         adapter.setStyle(mMessageStyle);
         mAdapter = adapter;
         mMessagesRecyclerView.setAdapter(adapter);

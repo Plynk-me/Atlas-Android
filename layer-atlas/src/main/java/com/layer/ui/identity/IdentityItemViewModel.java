@@ -38,6 +38,9 @@ public class IdentityItemViewModel extends FourPartItemViewModel<Identity> {
 
     @Override
     public String getAccessoryText() {
+        if (getItem().getLastSeenAt() == null) {
+            return "";
+        }
         return mDateFormatter.formatTimeDay(getItem().getLastSeenAt());
     }
 

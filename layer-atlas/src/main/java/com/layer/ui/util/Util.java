@@ -29,7 +29,6 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.authentication.AuthenticationListener;
 import com.layer.sdk.listeners.LayerProgressListener;
 import com.layer.sdk.messaging.Identity;
-import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.MessagePart;
 import com.layer.sdk.query.Queryable;
 import com.layer.ui.BuildConfig;
@@ -195,17 +194,18 @@ public class Util {
         return part.isContentReady();
     }
 
-    // TODO Is this the appropriate paradigm
+    // TODO Is this the appropriate paradigm?
     public static MessagePart getMessagePartBlocking(LayerClient layerClient, Uri partUri) {
-        final LiveData<LayerObject> liveData = layerClient.getLive(partUri);
+        final LiveData<MessagePart> liveData = layerClient.getLive(partUri, MessagePart.class);
         if (liveData.getValue() == null) {
             // Wait for the data to be loaded. This is okay since we're not on the main thread.
             final CountDownLatch latch = new CountDownLatch(1);
 
-            liveData.observeForever(new Observer<LayerObject>() {
+            liveData.observeForever(new Observer<MessagePart>() {
                 @Override
-                public void onChanged(@Nullable LayerObject layerObject) {
+                public void onChanged(@Nullable MessagePart layerObject) {
                     if (layerObject != null) {
+                        // TODO this has to be done on the main thread
                         liveData.removeObserver(this);
                         latch.countDown();
                     }
@@ -222,8 +222,7 @@ public class Util {
             }
         }
 
-        if (!(liveData.getValue() instanceof MessagePart)) return null;
-        return (MessagePart) liveData.getValue();
+        return liveData.getValue();
     }
 
     /**

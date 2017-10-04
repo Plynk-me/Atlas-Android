@@ -451,7 +451,7 @@ public class MessagesAdapter extends ItemRecyclerViewAdapter<Message, MessageIte
             statuses = message.getRecipientStatus();
             for (Map.Entry<Identity, Message.RecipientStatus> entry : statuses.entrySet()) {
                 // Only show receipts for other members
-                if (entry.getKey().equals(mLayerClient.getAuthenticatedUser())) continue;
+                if (entry.getKey().equals(mLayerClient.getAuthenticatedUserLive().getValue())) continue;
                 // Skip receipts for members no longer in the conversation
                 if (entry.getValue() == null) continue;
 
