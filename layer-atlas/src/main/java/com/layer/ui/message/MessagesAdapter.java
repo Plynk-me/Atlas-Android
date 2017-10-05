@@ -121,10 +121,6 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
         };
     }
 
-    public BinderRegistry getBinderRegistry() {
-        return mBinderRegistry;
-    }
-
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
@@ -142,6 +138,54 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
      */
     public void onDestroy() {
         mLayerClient.unregisterEventListener(mIdentityEventListener);
+    }
+
+    public BinderRegistry getBinderRegistry() {
+        return mBinderRegistry;
+    }
+
+    protected Integer getRecipientStatusPosition() {
+        return mRecipientStatusPosition;
+    }
+
+    protected DateFormatter getDateFormatter() {
+        return mDateFormatter;
+    }
+
+    protected IdentityFormatter getIdentityFormatter() {
+        return mIdentityFormatter;
+    }
+
+    protected IdentityRecyclerViewEventListener getIdentityEventListener() {
+        return mIdentityEventListener;
+    }
+
+    public boolean getShouldShowHeader() {
+        return mShouldShowHeader;
+    }
+
+    public void setShouldShowHeader(boolean shouldShowHeader) {
+        mShouldShowHeader = shouldShowHeader;
+    }
+
+    public boolean getShouldShowFooter() {
+        return mShouldShowFooter;
+    }
+
+    public void setShouldShowFooter(boolean shouldShowFooter) {
+        mShouldShowFooter = shouldShowFooter;
+    }
+
+    public void setIsOneOnOneConversation(boolean oneOnOneConversation) {
+        mIsOneOnOneConversation = oneOnOneConversation;
+    }
+
+    protected boolean isOneOnOneConversation() {
+        return mIsOneOnOneConversation;
+    }
+
+    public void setBinderRegistry(BinderRegistry binderRegistry) {
+        mBinderRegistry = binderRegistry;
     }
 
     public View getFooterView() {
@@ -194,28 +238,6 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
                 notifyItemChanged(headerPosition);
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        int itemCount;
-        if (mQueryController != null) {
-            itemCount = mQueryController.getItemCount();
-        } else {
-            itemCount = mItems.size();
-        }
-
-        return itemCount + ((mFooterView == null) ? 0 : 1) + (mHeaderView == null ? 0 : 1);
-    }
-
-    public int getHeaderPosition() {
-        if (mShouldShowHeader && mHeaderView != null) return 0;
-        return -1;
-    }
-
-    public int getFooterPosition() {
-        if (mShouldShowFooter && mFooterView != null) return getItemCount() - 1;
-        return -1;
     }
 
     /**
@@ -295,6 +317,28 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
         mAppendListener = listener;
     }
 
+    public int getHeaderPosition() {
+        if (mShouldShowHeader && mHeaderView != null) return 0;
+        return -1;
+    }
+
+    public int getFooterPosition() {
+        if (mShouldShowFooter && mFooterView != null) return getItemCount() - 1;
+        return -1;
+    }
+
+    @Override
+    public int getItemCount() {
+        int itemCount;
+        if (mQueryController != null) {
+            itemCount = mQueryController.getItemCount();
+        } else {
+            itemCount = mItems.size();
+        }
+
+        return itemCount + ((mFooterView == null) ? 0 : 1) + (mHeaderView == null ? 0 : 1);
+    }
+
     @Override
     public int getItemViewType(int position) {
         if (mShouldShowHeader && mHeaderView != null && position == getHeaderPosition()) {
@@ -370,46 +414,6 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
     }
 
     public abstract void bindLegacyMessageItem(MessageItemViewHolder<VIEW_MODEL, BINDING> viewHolder, MessageCluster cluster, int position);
-
-    protected Integer getRecipientStatusPosition() {
-        return mRecipientStatusPosition;
-    }
-
-    protected DateFormatter getDateFormatter() {
-        return mDateFormatter;
-    }
-
-    protected IdentityFormatter getIdentityFormatter() {
-        return mIdentityFormatter;
-    }
-
-    protected IdentityRecyclerViewEventListener getIdentityEventListener() {
-        return mIdentityEventListener;
-    }
-
-    public boolean getShouldShowHeader() {
-        return mShouldShowHeader;
-    }
-
-    public void setShouldShowHeader(boolean shouldShowHeader) {
-        mShouldShowHeader = shouldShowHeader;
-    }
-
-    public boolean getShouldShowFooter() {
-        return mShouldShowFooter;
-    }
-
-    public void setShouldShowFooter(boolean shouldShowFooter) {
-        mShouldShowFooter = shouldShowFooter;
-    }
-
-    public void setIsOneOnOneConversation(boolean oneOnOneConversation) {
-        mIsOneOnOneConversation = oneOnOneConversation;
-    }
-
-    public boolean isOneOnOneConversation() {
-        return mIsOneOnOneConversation;
-    }
 
     //==============================================================================================
     // Clustering
