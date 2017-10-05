@@ -54,7 +54,7 @@ public class ConversationItemTestActivity extends Activity {
         TestActivityFourPartItemBinding binding = DataBindingUtil.setContentView(this, R.layout.test_activity_four_part_item);
         FourPartItemStyle style = new FourPartItemStyle(this, null, 0);
 
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(this.getApplicationContext(), layerClient);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(layerClient.getAuthenticatedUser());
         viewModel.setItem(conversation);

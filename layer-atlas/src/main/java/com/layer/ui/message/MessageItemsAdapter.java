@@ -21,7 +21,7 @@ public class MessageItemsAdapter extends MessagesAdapter {
 
     @Override
     protected MessageItemHeaderViewHolder createHeaderViewHolder(ViewGroup parent) {
-        return new MessageItemHeaderViewHolder(parent, new ItemViewModel<Message>());
+        return new MessageItemHeaderViewHolder(parent, new ItemViewModel<Message>(getContext(), getLayerClient()));
     }
 
     @Override
@@ -38,9 +38,11 @@ public class MessageItemsAdapter extends MessagesAdapter {
     @Override
     protected MessageItemCardViewHolder createCardMessageItemViewHolder(ViewGroup parent) {
         MessageItemCardViewModel viewModel = new MessageItemCardViewModel(parent.getContext(),
-                getLayerClient(), getImageCacheWrapper(), getDateFormatter(), getIdentityFormatter(),
-                getIdentityEventListener(), areReadReceiptsEnabled(),
-                getShouldShowAvatarInOneOnOneConversations(), getShouldShowAvatarPresence());
+                getLayerClient(), getImageCacheWrapper(), getIdentityEventListener());
+
+        viewModel.setEnableReadReceipts(areReadReceiptsEnabled());
+        viewModel.setShowAvatars(getShouldShowAvatarInOneOnOneConversations());
+        viewModel.setShowPresence(getShouldShowPresence());
 
         return new MessageItemCardViewHolder(parent, viewModel);
     }
@@ -55,9 +57,11 @@ public class MessageItemsAdapter extends MessagesAdapter {
     @Override
     protected MessageItemLegacyViewHolder createLegacyMessageItemViewHolder(ViewGroup parent, MessageCell messageCell) {
         MessageItemLegacyViewModel viewModel = new MessageItemLegacyViewModel(parent.getContext(),
-                getLayerClient(), getImageCacheWrapper(), getDateFormatter(), getIdentityFormatter(),
-                getIdentityEventListener(), areReadReceiptsEnabled(),
-                getShouldShowAvatarInOneOnOneConversations(), getShouldShowAvatarPresence());
+                getLayerClient(), getImageCacheWrapper(), getIdentityEventListener());
+
+        viewModel.setEnableReadReceipts(areReadReceiptsEnabled());
+        viewModel.setShowAvatars(getShouldShowAvatarInOneOnOneConversations());
+        viewModel.setShowPresence(getShouldShowPresence());
 
         return new MessageItemLegacyViewHolder(parent, viewModel, messageCell);
     }
@@ -72,8 +76,11 @@ public class MessageItemsAdapter extends MessagesAdapter {
     @Override
     protected MessageItemFooterViewHolder createFooterViewHolder(ViewGroup parent) {
         MessageItemLegacyViewModel viewModel = new MessageItemLegacyViewModel(parent.getContext(),
-                getLayerClient(), getImageCacheWrapper(), getDateFormatter(), getIdentityFormatter(),
-                getIdentityEventListener(), false, false, false);
+                getLayerClient(), getImageCacheWrapper(), getIdentityEventListener());
+
+        viewModel.setEnableReadReceipts(false);
+        viewModel.setShowAvatars(getShouldShowAvatarInOneOnOneConversations());
+        viewModel.setShowPresence(false);
 
         return new MessageItemFooterViewHolder(parent, viewModel, getImageCacheWrapper());
     }

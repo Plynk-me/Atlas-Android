@@ -57,7 +57,7 @@ public class ConversationItemViewModelTest {
 
     @Test
     public void testGetTitle() {
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(context, layerClient);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(layerClient.getAuthenticatedUser());
         viewModel.setItem(conversation);
@@ -67,7 +67,7 @@ public class ConversationItemViewModelTest {
 
     @Test
     public void testGetSubtitle() {
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(context, layerClient);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(layerClient.getAuthenticatedUser());
         viewModel.setItem(conversation);
@@ -77,7 +77,7 @@ public class ConversationItemViewModelTest {
 
     @Test
     public void testAccessoryText() {
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(context, layerClient);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(layerClient.getAuthenticatedUser());
         viewModel.setItem(conversation);
@@ -87,7 +87,7 @@ public class ConversationItemViewModelTest {
 
     @Test
     public void testIsUnread() {
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(context, layerClient);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(layerClient.getAuthenticatedUser());
         viewModel.setItem(conversation);
@@ -97,7 +97,7 @@ public class ConversationItemViewModelTest {
 
     @Test
     public void testGetParticipantsDoesNotContainAuthenticatedUser() {
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(context, layerClient);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(layerClient.getAuthenticatedUser());
         viewModel.setItem(conversation);

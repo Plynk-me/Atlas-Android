@@ -60,11 +60,11 @@ public class ConversationItemsAdapter extends ItemRecyclerViewAdapter<Conversati
     @Override
     public FourPartItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         UiFourPartItemBinding binding = UiFourPartItemBinding.inflate(getLayoutInflater(), parent, false);
-        ConversationItemViewModel viewModel = new ConversationItemViewModel();
+        ConversationItemViewModel viewModel = new ConversationItemViewModel(getContext(), getLayerClient());
         viewModel.setItemClickListener(mItemClickListener);
         viewModel.setConversationItemFormatter(mConversationItemFormatter);
         viewModel.setAuthenticatedUser(mLayerClient.getAuthenticatedUser());
-        FourPartItemViewHolder itemViewHolder = new FourPartItemViewHolder<>(binding, viewModel, getStyle(), mImageCacheWrapper, mIdentityFormatter);
+        FourPartItemViewHolder itemViewHolder = new FourPartItemViewHolder<>(binding, viewModel, getStyle(), mImageCacheWrapper);
 
         binding.addOnRebindCallback(mOnRebindCallback);
 

@@ -7,8 +7,6 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Identity;
 import com.layer.sdk.messaging.Message;
 import com.layer.ui.R;
-import com.layer.ui.identity.IdentityFormatter;
-import com.layer.ui.util.DateFormatter;
 import com.layer.ui.util.IdentityRecyclerViewEventListener;
 import com.layer.ui.util.imagecache.ImageCacheWrapper;
 import com.layer.ui.viewmodel.ItemViewModel;
@@ -22,13 +20,9 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
 
     // Config
     private boolean mEnableReadReceipts;
-    private DateFormatter mDateFormatter;
-    private IdentityFormatter mIdentityFormatter;
     private IdentityRecyclerViewEventListener mIdentityEventListener;
     private boolean mShowAvatars;
     private boolean mShowPresence;
-    private LayerClient mLayerClient;
-    private Context mContext;
     private ImageCacheWrapper mImageCacheWrapper;
 
     // View related variables
@@ -52,16 +46,11 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
 
     public MessageItemLegacyViewModel(Context context, LayerClient layerClient,
                                       ImageCacheWrapper imageCacheWrapper,
-                                      DateFormatter dateFormatter, IdentityFormatter identityFormatter,
-                                      IdentityRecyclerViewEventListener identityEventListener,
-                                      boolean enableReadReceipts, boolean showAvatars, boolean showPresence) {
-        mDateFormatter = dateFormatter;
-        mEnableReadReceipts = enableReadReceipts;
-        mShowAvatars = showAvatars;
-        mShowPresence = showPresence;
-        mLayerClient = layerClient;
-        mContext = context;
-        mIdentityFormatter = identityFormatter;
+                                      IdentityRecyclerViewEventListener identityEventListener) {
+        super(context, layerClient);
+        mEnableReadReceipts = true;
+        mShowAvatars = true;
+        mShowPresence = true;
         mIdentityEventListener = identityEventListener;
         mImageCacheWrapper = imageCacheWrapper;
     }
@@ -120,9 +109,9 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
                     (cluster.mClusterWithPrevious == null
                             || cluster.mClusterWithPrevious == MessageCluster.Type.NEW_SENDER)) {
                 if (sender != null) {
-                    mSenderName = mIdentityFormatter.getDisplayName(sender);
+                    mSenderName = getIdentityFormatter().getDisplayName(sender);
                 } else {
-                    mSenderName = mIdentityFormatter.getUnknownNameString();
+                    mSenderName = getIdentityFormatter().getUnknownNameString();
                 }
                 mShouldShowDisplayName = true;
 
@@ -166,7 +155,7 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
             Map<Identity, Message.RecipientStatus> statuses = message.getRecipientStatus();
             for (Map.Entry<Identity, Message.RecipientStatus> entry : statuses.entrySet()) {
                 // Only show receipts for other members
-                if (entry.getKey().equals(mLayerClient.getAuthenticatedUser())) continue;
+                if (entry.getKey().equals(getLayerClient().getAuthenticatedUser())) continue;
                 // Skip receipts for members no longer in the conversation
                 if (entry.getValue() == null) continue;
 
@@ -185,14 +174,14 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
 
                 // Use 2 to include one other participant plus the current user
                 if (statuses.size() > 2) {
-                    mReadReceipt = mContext.getResources()
+                    mReadReceipt = getContext().getResources()
                             .getQuantityString(R.plurals.layer_ui_message_item_read_muliple_participants, readCount, readCount);
                 } else {
-                    mReadReceipt = mContext.getString(R.string.layer_ui_message_item_read);
+                    mReadReceipt = getContext().getString(R.string.layer_ui_message_item_read);
                 }
             } else if (delivered) {
                 mIsReadReceiptVisible = true;
-                mReadReceipt = mContext.getString(R.string.layer_ui_message_item_delivered);
+                mReadReceipt = getContext().getString(R.string.layer_ui_message_item_delivered);
             } else {
                 mIsReadReceiptVisible = false;
             }
@@ -205,8 +194,8 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
         Date receivedAt = message.getReceivedAt();
         if (receivedAt == null) receivedAt = new Date();
 
-        mTimeGroupDay = mDateFormatter.formatTimeDay(receivedAt);
-        mGroupTime = mDateFormatter.formatTime(receivedAt);
+        mTimeGroupDay = getDateFormatter().formatTimeDay(receivedAt);
+        mGroupTime = getDateFormatter().formatTime(receivedAt);
 
         mShouldShowDateTimeForMessage = true;
     }
@@ -215,35 +204,23 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
         return getItem().getConversation().getParticipants().size() == 2;
     }
 
-    public IdentityFormatter getIdentityFormatter() {
-        return mIdentityFormatter;
-    }
-
     public ImageCacheWrapper getImageCacheWrapper() {
         return mImageCacheWrapper;
     }
 
-    public LayerClient getLayerClient() {
-        return mLayerClient;
+    public void setShowAvatars(boolean showAvatars) {
+        mShowAvatars = showAvatars;
+    }
+
+    public void setShowPresence(boolean showPresence) {
+        mShowPresence = showPresence;
+    }
+
+    public void setEnableReadReceipts(boolean enableReadReceipts) {
+        mEnableReadReceipts = enableReadReceipts;
     }
 
     // To be eliminated
-
-    public void setParticipants(Set<Identity> identities) {
-        mParticipants = identities;
-    }
-
-    public void setMessageFooterAnimationVisibility(boolean isVisible) {
-        mMessageFooterAnimationIsVisible = isVisible;
-    }
-
-    public void setTypingIndicatorMessageVisibility(boolean isTypingIndicatorVisible) {
-        mIsTypingIndicatorVisible = isTypingIndicatorVisible;
-    }
-
-    public void setTypingIndicatorMessage(String typingIndicatorMessage) {
-        mTypingIndicatorMessage = typingIndicatorMessage;
-    }
 
     public void setAvatarViewVisibilityType(boolean avatarViewVisibilityType) {
         mIsAvatarViewVisible = avatarViewVisibilityType;
@@ -254,9 +231,17 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
         return mMessageFooterAnimationIsVisible;
     }
 
+    public void setMessageFooterAnimationVisibility(boolean isVisible) {
+        mMessageFooterAnimationIsVisible = isVisible;
+    }
+
     @Bindable
     public String getTypingIndicatorMessage() {
         return mTypingIndicatorMessage;
+    }
+
+    public void setTypingIndicatorMessage(String typingIndicatorMessage) {
+        mTypingIndicatorMessage = typingIndicatorMessage;
     }
 
     @Bindable
@@ -264,12 +249,16 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
         return mIsTypingIndicatorVisible;
     }
 
-    // Bindable properties
+    public void setTypingIndicatorMessageVisibility(boolean isTypingIndicatorVisible) {
+        mIsTypingIndicatorVisible = isTypingIndicatorVisible;
+    }
 
     @Bindable
     public boolean isClusterSpaceVisible() {
         return mIsClusterSpaceVisible;
     }
+
+    // Bindable properties
 
     @Bindable
     public boolean getAvatarVisibility() {
@@ -284,6 +273,10 @@ public class MessageItemLegacyViewModel extends ItemViewModel<Message> {
     @Bindable
     public Set<Identity> getParticipants() {
         return mParticipants;
+    }
+
+    public void setParticipants(Set<Identity> identities) {
+        mParticipants = identities;
     }
 
     @Bindable

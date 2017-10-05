@@ -243,7 +243,7 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
      * shown
      * or not. Defaults to `true`.
      */
-    public boolean getShouldShowAvatarPresence() {
+    public boolean getShouldShowPresence() {
         return mShouldShowAvatarPresence;
     }
 

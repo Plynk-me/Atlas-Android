@@ -7,8 +7,6 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Identity;
 import com.layer.sdk.messaging.Message;
 import com.layer.ui.R;
-import com.layer.ui.identity.IdentityFormatter;
-import com.layer.ui.util.DateFormatter;
 import com.layer.ui.util.IdentityRecyclerViewEventListener;
 import com.layer.ui.util.imagecache.ImageCacheWrapper;
 import com.layer.ui.viewmodel.ItemViewModel;
@@ -19,14 +17,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class MessageItemCardViewModel extends ItemViewModel<Message> {
-    // Basic dependencies
-    private Context mContext;
-    private LayerClient mLayerClient;
 
     // Config
     private boolean mEnableReadReceipts;
-    private DateFormatter mDateFormatter;
-    private IdentityFormatter mIdentityFormatter;
     private IdentityRecyclerViewEventListener mIdentityEventListener;
     private boolean mShowAvatars;
     private boolean mShowPresence;
@@ -50,16 +43,11 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
 
     public MessageItemCardViewModel(Context context, LayerClient layerClient,
                                     ImageCacheWrapper imageCacheWrapper,
-                                    DateFormatter dateFormatter, IdentityFormatter identityFormatter,
-                                    IdentityRecyclerViewEventListener identityEventListener,
-                                    boolean enableReadReceipts, boolean showAvatars, boolean showPresence) {
-        mDateFormatter = dateFormatter;
-        mEnableReadReceipts = enableReadReceipts;
-        mShowAvatars = showAvatars;
-        mShowPresence = showPresence;
-        mLayerClient = layerClient;
-        mContext = context;
-        mIdentityFormatter = identityFormatter;
+                                    IdentityRecyclerViewEventListener identityEventListener) {
+        super(context, layerClient);
+        mEnableReadReceipts = true;
+        mShowAvatars = true;
+        mShowPresence = true;
         mIdentityEventListener = identityEventListener;
         mImageCacheWrapper = imageCacheWrapper;
     }
@@ -67,7 +55,7 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
     public void update(MessageCluster cluster, int position, Integer recipientStatusPosition) {
         Message message = getItem();
         mParticipants = Collections.singleton(message.getSender());
-        mIsMyMessage = getItem().getSender().equals(mLayerClient.getAuthenticatedUser());
+        mIsMyMessage = getItem().getSender().equals(getLayerClient().getAuthenticatedUser());
 
         // Clustering and dates
         updateClusteringAndDates(message, cluster);
@@ -101,8 +89,8 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
         Date receivedAt = message.getReceivedAt();
         if (receivedAt == null) receivedAt = new Date();
 
-        mTimeGroupDay = mDateFormatter.formatTimeDay(receivedAt);
-        mGroupTime = mDateFormatter.formatTime(receivedAt);
+        mTimeGroupDay = getDateFormatter().formatTimeDay(receivedAt);
+        mGroupTime = getDateFormatter().formatTime(receivedAt);
 
         mShouldShowDateTimeForMessage = true;
     }
@@ -126,9 +114,9 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
                     (cluster.mClusterWithPrevious == null
                             || cluster.mClusterWithPrevious == MessageCluster.Type.NEW_SENDER)) {
                 if (sender != null) {
-                    mSenderName = mIdentityFormatter.getDisplayName(sender);
+                    mSenderName = getIdentityFormatter().getDisplayName(sender);
                 } else {
-                    mSenderName = mIdentityFormatter.getUnknownNameString();
+                    mSenderName = getIdentityFormatter().getUnknownNameString();
                 }
                 mShouldShowDisplayName = true;
 
@@ -172,7 +160,7 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
             Map<Identity, Message.RecipientStatus> statuses = message.getRecipientStatus();
             for (Map.Entry<Identity, Message.RecipientStatus> entry : statuses.entrySet()) {
                 // Only show receipts for other members
-                if (entry.getKey().equals(mLayerClient.getAuthenticatedUser())) continue;
+                if (entry.getKey().equals(getLayerClient().getAuthenticatedUser())) continue;
                 // Skip receipts for members no longer in the conversation
                 if (entry.getValue() == null) continue;
 
@@ -191,14 +179,14 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
 
                 // Use 2 to include one other participant plus the current user
                 if (statuses.size() > 2) {
-                    mReadReceipt = mContext.getResources()
+                    mReadReceipt = getContext().getResources()
                             .getQuantityString(R.plurals.layer_ui_message_item_read_muliple_participants, readCount, readCount);
                 } else {
-                    mReadReceipt = mContext.getString(R.string.layer_ui_message_item_read);
+                    mReadReceipt = getContext().getString(R.string.layer_ui_message_item_read);
                 }
             } else if (delivered) {
                 mIsReadReceiptVisible = true;
-                mReadReceipt = mContext.getString(R.string.layer_ui_message_item_delivered);
+                mReadReceipt = getContext().getString(R.string.layer_ui_message_item_delivered);
             } else {
                 mIsReadReceiptVisible = false;
             }
@@ -211,16 +199,24 @@ public class MessageItemCardViewModel extends ItemViewModel<Message> {
         return getItem().getConversation().getParticipants().size() == 2;
     }
 
-    public IdentityFormatter getIdentityFormatter() {
-        return mIdentityFormatter;
+    // Setters
+
+    public void setShowAvatars(boolean showAvatars) {
+        mShowAvatars = showAvatars;
     }
+
+    public void setShowPresence(boolean showPresence) {
+        mShowPresence = showPresence;
+    }
+
+    public void setEnableReadReceipts(boolean enableReadReceipts) {
+        mEnableReadReceipts = enableReadReceipts;
+    }
+
+    // Getters
 
     public ImageCacheWrapper getImageCacheWrapper() {
         return mImageCacheWrapper;
-    }
-
-    public LayerClient getLayerClient() {
-        return mLayerClient;
     }
 
     // Bindable properties

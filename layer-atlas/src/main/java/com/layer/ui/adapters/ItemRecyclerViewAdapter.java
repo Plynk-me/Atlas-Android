@@ -43,6 +43,7 @@ public abstract class ItemRecyclerViewAdapter<ITEM extends Queryable,
     protected OnRebindCallback<BINDING> mOnRebindCallback;
 
     protected ItemRecyclerViewAdapter(Context context, LayerClient layerClient, String tag, boolean hasStableIds) {
+        mContext = context;
         mLayerClient = layerClient;
         TAG = tag;
         setHasStableIds(hasStableIds);

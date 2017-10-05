@@ -7,11 +7,10 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Identity;
 import com.layer.ui.adapters.ItemRecyclerViewAdapter;
 import com.layer.ui.databinding.UiFourPartItemBinding;
+import com.layer.ui.fourpartitem.FourPartItemViewHolder;
 import com.layer.ui.style.FourPartItemStyle;
 import com.layer.ui.util.DateFormatter;
 import com.layer.ui.util.imagecache.ImageCacheWrapper;
-
-import com.layer.ui.fourpartitem.FourPartItemViewHolder;
 
 public class IdentityItemsAdapter extends ItemRecyclerViewAdapter<Identity, IdentityItemViewModel,
         UiFourPartItemBinding, FourPartItemStyle, FourPartItemViewHolder<Identity, IdentityItemViewModel>> {
@@ -34,11 +33,13 @@ public class IdentityItemsAdapter extends ItemRecyclerViewAdapter<Identity, Iden
     @Override
     public FourPartItemViewHolder<Identity, IdentityItemViewModel> onCreateViewHolder(ViewGroup parent, int viewType) {
         UiFourPartItemBinding binding = UiFourPartItemBinding.inflate(getLayoutInflater(), parent, false);
-        IdentityItemViewModel viewModel = new IdentityItemViewModel();
+        IdentityItemViewModel viewModel = new IdentityItemViewModel(getContext(), getLayerClient());
+
         viewModel.setItemClickListener(getItemClickListener());
         viewModel.setIdentityFormatter(mIdentityFormatter);
         viewModel.setDateFormatter(mDateFormatter);
-        FourPartItemViewHolder<Identity, IdentityItemViewModel> viewHolder = new FourPartItemViewHolder<>(binding, viewModel, getStyle(), mImageCacheWrapper, mIdentityFormatter);
+
+        FourPartItemViewHolder<Identity, IdentityItemViewModel> viewHolder = new FourPartItemViewHolder<>(binding, viewModel, getStyle(), mImageCacheWrapper);
 
         binding.addOnRebindCallback(mOnRebindCallback);
 
