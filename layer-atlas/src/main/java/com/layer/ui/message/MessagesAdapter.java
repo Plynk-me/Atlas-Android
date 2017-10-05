@@ -14,6 +14,7 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Identity;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.query.ListViewController;
+import com.layer.sdk.query.Query;
 import com.layer.sdk.query.RecyclerViewController;
 import com.layer.ui.adapters.ItemRecyclerViewAdapter;
 import com.layer.ui.identity.IdentityFormatter;
@@ -25,6 +26,7 @@ import com.layer.ui.util.IdentityRecyclerViewEventListener;
 import com.layer.ui.util.imagecache.ImageCacheWrapper;
 import com.layer.ui.viewmodel.ItemViewModel;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -61,34 +63,33 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
 
     protected static final String TAG = MessagesAdapter.class.getSimpleName();
 
-    protected final Handler mUiThreadHandler;
-    protected final DisplayMetrics mDisplayMetrics;
-    protected final IdentityRecyclerViewEventListener mIdentityEventListener;
-    protected final RecyclerView.OnScrollListener mOnScrollListener;
+    private final Handler mUiThreadHandler;
+    private final DisplayMetrics mDisplayMetrics;
+    private final IdentityRecyclerViewEventListener mIdentityEventListener;
+    private final RecyclerView.OnScrollListener mOnScrollListener;
 
     // Dates and Clustering
-    protected final Map<Uri, MessageCluster> mClusterCache = new HashMap<>();
-    protected OnMessageAppendListener mAppendListener;
+    private final Map<Uri, MessageCluster> mClusterCache = new HashMap<>();
+    private OnMessageAppendListener mAppendListener;
 
+    private BinderRegistry mBinderRegistry;
+    private boolean mIsOneOnOneConversation;
+    private boolean mShouldShowAvatarInOneOnOneConversations;
+    private boolean mShouldShowAvatarPresence = true;
 
-    protected BinderRegistry mBinderRegistry;
-    protected boolean mIsOneOnOneConversation;
-    protected boolean mShouldShowAvatarInOneOnOneConversations;
-    protected boolean mShouldShowAvatarPresence = true;
+    private View mHeaderView;
+    private boolean mShouldShowHeader = true;
 
-    protected View mHeaderView;
-    protected boolean mShouldShowHeader = true;
+    private View mFooterView;
+    private boolean mShouldShowFooter = true;
 
-    protected View mFooterView;
-    protected boolean mShouldShowFooter = true;
+    private Integer mRecipientStatusPosition;
+    private boolean mReadReceiptsEnabled = true;
+    private ImageCacheWrapper mImageCacheWrapper;
 
-    protected Integer mRecipientStatusPosition;
-    protected boolean mReadReceiptsEnabled = true;
-    protected ImageCacheWrapper mImageCacheWrapper;
-
-    protected DateFormatter mDateFormatter;
-    protected IdentityFormatter mIdentityFormatter;
-    protected Set<Identity> mUsersTyping;
+    private DateFormatter mDateFormatter;
+    private IdentityFormatter mIdentityFormatter;
+    private Set<Identity> mUsersTyping;
 
     public MessagesAdapter(Context context, LayerClient layerClient,
                            ImageCacheWrapper imageCacheWrapper, DateFormatter dateFormatter,
@@ -101,16 +102,8 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
         mDisplayMetrics = context.getResources().getDisplayMetrics();
         mBinderRegistry = new BinderRegistry(layerClient);
 
-        mQueryController = layerClient.newRecyclerViewController(null, null, this);
-        mQueryController.setPreProcessCallback(new RecyclerViewController.PreProcessCallback<Message>() {
-            @Override
-            public void onCache(ListViewController listViewController, Message message) {
-                mBinderRegistry.cacheContent(message);
-            }
-        });
-
         mIdentityEventListener = new IdentityRecyclerViewEventListener(this);
-        mLayerClient.registerEventListener(mIdentityEventListener);
+        getLayerClient().registerEventListener(mIdentityEventListener);
 
         mOnScrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -119,6 +112,17 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
                 mBinderRegistry.notifyScrollStateChange(newState);
             }
         };
+    }
+
+    @Override
+    public void setQuery(Query<Message> query, Collection<String> updateAttributes) {
+        super.setQuery(query, updateAttributes);
+        getQueryController().setPreProcessCallback(new RecyclerViewController.PreProcessCallback<Message>() {
+            @Override
+            public void onCache(ListViewController listViewController, Message message) {
+                mBinderRegistry.cacheContent(message);
+            }
+        });
     }
 
     @Override
@@ -137,10 +141,10 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
      * Performs cleanup when the Activity/Fragment using the adapter is destroyed.
      */
     public void onDestroy() {
-        mLayerClient.unregisterEventListener(mIdentityEventListener);
+        getLayerClient().unregisterEventListener(mIdentityEventListener);
     }
 
-    public BinderRegistry getBinderRegistry() {
+    protected BinderRegistry getBinderRegistry() {
         return mBinderRegistry;
     }
 
@@ -213,6 +217,10 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
                 notifyItemChanged(footerPosition);
             }
         }
+    }
+
+    protected Set<Identity> getUsersTyping() {
+        return mUsersTyping;
     }
 
     public View getHeaderView() {
@@ -330,10 +338,10 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
     @Override
     public int getItemCount() {
         int itemCount;
-        if (mQueryController != null) {
-            itemCount = mQueryController.getItemCount();
+        if (getQueryController() != null) {
+            itemCount = getQueryController().getItemCount();
         } else {
-            itemCount = mItems.size();
+            itemCount = getItems().size();
         }
 
         return itemCount + ((mFooterView == null) ? 0 : 1) + (mHeaderView == null ? 0 : 1);
@@ -499,7 +507,7 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
         if (mReadReceiptsEnabled) {
             Integer oldPosition = mRecipientStatusPosition;
             // Set new position to last in the list
-            mRecipientStatusPosition = mQueryController.getItemCount() - 1;
+            mRecipientStatusPosition = getQueryController().getItemCount() - 1;
             if (oldPosition != null) {
                 notifyItemChanged(oldPosition);
             }

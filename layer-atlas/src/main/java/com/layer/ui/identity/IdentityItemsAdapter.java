@@ -10,6 +10,7 @@ import com.layer.ui.databinding.UiFourPartItemBinding;
 import com.layer.ui.fourpartitem.FourPartItemViewHolder;
 import com.layer.ui.style.FourPartItemStyle;
 import com.layer.ui.util.DateFormatter;
+import com.layer.ui.util.DateFormatterImpl;
 import com.layer.ui.util.imagecache.ImageCacheWrapper;
 
 public class IdentityItemsAdapter extends ItemRecyclerViewAdapter<Identity, IdentityItemViewModel,
@@ -17,38 +18,32 @@ public class IdentityItemsAdapter extends ItemRecyclerViewAdapter<Identity, Iden
 
     protected static final String TAG = "IdentityItemsAdapter";
 
-    protected IdentityFormatter mIdentityFormatter;
-    protected DateFormatter mDateFormatter;
     protected ImageCacheWrapper mImageCacheWrapper;
+    private DateFormatter mDateFormatter;
+    private IdentityFormatter mIdentityFormatter;
 
     public IdentityItemsAdapter(Context context, LayerClient layerClient,
-                                ImageCacheWrapper imageCacheWrapper, IdentityFormatter identityFormatter,
-                                DateFormatter dateFormatter) {
+                                ImageCacheWrapper imageCacheWrapper) {
         super(context, layerClient, TAG, false);
-        mIdentityFormatter = identityFormatter;
-        mDateFormatter = dateFormatter;
         mImageCacheWrapper = imageCacheWrapper;
+        mDateFormatter = new DateFormatterImpl(context);
+        mIdentityFormatter = new IdentityFormatterImpl(context);
     }
 
     @Override
     public FourPartItemViewHolder<Identity, IdentityItemViewModel> onCreateViewHolder(ViewGroup parent, int viewType) {
         UiFourPartItemBinding binding = UiFourPartItemBinding.inflate(getLayoutInflater(), parent, false);
         IdentityItemViewModel viewModel = new IdentityItemViewModel(getContext(), getLayerClient());
+        viewModel.setDateFormatter(mDateFormatter);
+        viewModel.setIdentityFormatter(mIdentityFormatter);
 
         viewModel.setItemClickListener(getItemClickListener());
-        viewModel.setIdentityFormatter(mIdentityFormatter);
-        viewModel.setDateFormatter(mDateFormatter);
 
         FourPartItemViewHolder<Identity, IdentityItemViewModel> viewHolder = new FourPartItemViewHolder<>(binding, viewModel, getStyle(), mImageCacheWrapper);
 
-        binding.addOnRebindCallback(mOnRebindCallback);
+        binding.addOnRebindCallback(getOnRebindCallback());
 
         return viewHolder;
-    }
-
-    @Override
-    public void onBindEmpty(FourPartItemViewHolder<Identity, IdentityItemViewModel> holder) {
-        super.onBindEmpty(holder);
     }
 
     @Override
@@ -59,5 +54,13 @@ public class IdentityItemsAdapter extends ItemRecyclerViewAdapter<Identity, Iden
     @Override
     public void onDestroy() {
         // NO OP
+    }
+
+    public void setDateFormatter(DateFormatter dateFormatter) {
+        mDateFormatter = dateFormatter;
+    }
+
+    public void setIdentityFormatter(IdentityFormatter identityFormatter) {
+        mIdentityFormatter = identityFormatter;
     }
 }

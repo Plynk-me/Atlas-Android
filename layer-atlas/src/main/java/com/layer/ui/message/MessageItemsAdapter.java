@@ -51,7 +51,7 @@ public class MessageItemsAdapter extends MessagesAdapter {
     public void bindCardMessageItem(MessageItemViewHolder viewHolder, MessageCluster messageCluster, int position) {
         MessageItemCardViewHolder holder = (MessageItemCardViewHolder) viewHolder;
 
-        holder.bind(messageCluster, position, getRecipientStatusPosition(), mRecyclerView.getWidth());
+        holder.bind(messageCluster, position, getRecipientStatusPosition(), getRecyclerView().getWidth());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class MessageItemsAdapter extends MessagesAdapter {
     public void bindLegacyMessageItem(MessageItemViewHolder holder, MessageCluster messageCluster, int position) {
         MessageItemLegacyViewHolder viewHolder = (MessageItemLegacyViewHolder) holder;
 
-        viewHolder.bind(messageCluster, position, getRecipientStatusPosition(), mRecyclerView.getWidth());
+        viewHolder.bind(messageCluster, position, getRecipientStatusPosition(), getRecyclerView().getWidth());
     }
 
     @Override
@@ -97,6 +97,6 @@ public class MessageItemsAdapter extends MessagesAdapter {
         }
 
         boolean shouldAvatarViewBeVisible = !(isOneOnOneConversation() & !getShouldShowAvatarInOneOnOneConversations());
-        viewHolder.bind(mUsersTyping, footerView, shouldAvatarViewBeVisible);
+        viewHolder.bind(getUsersTyping(), footerView, shouldAvatarViewBeVisible);
     }
 }

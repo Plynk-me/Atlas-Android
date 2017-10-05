@@ -16,13 +16,13 @@ import com.layer.ui.util.DateFormatterImpl;
 
 public class ItemViewModel<ITEM extends Queryable> extends BaseObservable {
 
-    protected Context mContext;
-    protected LayerClient mLayerClient;
+    private Context mContext;
+    private LayerClient mLayerClient;
 
-    protected ITEM mItem;
-    protected OnItemClickListener<ITEM> mItemClickListener;
-    protected IdentityFormatter mIdentityFormatter;
-    protected DateFormatter mDateFormatter;
+    private ITEM mItem;
+    private OnItemClickListener<ITEM> mItemClickListener;
+    private IdentityFormatter mIdentityFormatter;
+    private DateFormatter mDateFormatter;
 
     public ItemViewModel(Context context, LayerClient layerClient) {
         mContext = context;

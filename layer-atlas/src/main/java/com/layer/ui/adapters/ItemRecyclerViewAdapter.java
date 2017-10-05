@@ -29,18 +29,18 @@ public abstract class ItemRecyclerViewAdapter<ITEM extends Queryable,
 
     private final String TAG;
 
-    protected Context mContext;
-    protected LayoutInflater mLayoutInflater;
-    protected RecyclerView mRecyclerView;
+    private Context mContext;
+    private LayoutInflater mLayoutInflater;
+    private RecyclerView mRecyclerView;
 
-    protected RecyclerViewController<ITEM> mQueryController;
-    protected List<ITEM> mItems;
-    protected LayerClient mLayerClient;
+    private RecyclerViewController<ITEM> mQueryController;
+    private List<ITEM> mItems;
+    private LayerClient mLayerClient;
 
-    protected STYLE mStyle;
-    protected OnItemClickListener<ITEM> mItemClickListener;
+    private STYLE mStyle;
+    private OnItemClickListener<ITEM> mItemClickListener;
 
-    protected OnRebindCallback<BINDING> mOnRebindCallback;
+    private OnRebindCallback<BINDING> mOnRebindCallback;
 
     protected ItemRecyclerViewAdapter(Context context, LayerClient layerClient, String tag, boolean hasStableIds) {
         mContext = context;
@@ -314,7 +314,19 @@ public abstract class ItemRecyclerViewAdapter<ITEM extends Queryable,
         return mQueryController;
     }
 
+    protected List<ITEM> getItems() {
+        return mItems;
+    }
+
     protected LayerClient getLayerClient() {
         return mLayerClient;
+    }
+
+    protected OnRebindCallback<BINDING> getOnRebindCallback() {
+        return mOnRebindCallback;
+    }
+
+    protected RecyclerView getRecyclerView() {
+        return mRecyclerView;
     }
 }
