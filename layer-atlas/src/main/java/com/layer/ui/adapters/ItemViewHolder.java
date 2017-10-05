@@ -29,7 +29,7 @@ public class ItemViewHolder<ITEM extends Queryable, VIEW_MODEL extends ItemViewM
     }
 
     public ItemViewHolder(ViewGroup parent, @LayoutRes int layoutId, VIEW_MODEL viewModel) {
-        this((BINDING) DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), layoutId, parent, false), viewModel);
+        this(DataBindingUtil.<BINDING>inflate(LayoutInflater.from(parent.getContext()), layoutId, parent, false), viewModel);
     }
 
     public BINDING getBinding() {
