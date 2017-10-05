@@ -383,7 +383,7 @@ public abstract class MessagesAdapter<VIEW_MODEL extends ItemViewModel<Message>,
         } else if (viewType == mBinderRegistry.VIEW_TYPE_FOOTER) {
             bindFooter(viewHolder);
         } else if (viewType == mBinderRegistry.VIEW_TYPE_CARD) {
-
+            prepareAndBindCard(viewHolder, position);
         } else {
             prepareAndBindMessageItem(viewHolder, position);
         }
